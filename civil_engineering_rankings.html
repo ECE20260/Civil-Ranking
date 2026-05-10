@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ترتيب طلاب الهندسة المدنية - الرابعة</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f4f6fb; --card: #ffffff; --border: #e2e8f0; --text: #1a202c; --muted: #718096;
+    --mumtaz-bg: #f0fdf4; --mumtaz-text: #166534; --mumtaz-border: #bbf7d0;
+    --jaydj-bg: #eff6ff;  --jaydj-text: #1e40af;  --jaydj-border: #bfdbfe;
+    --jayd-bg: #fefce8;   --jayd-text: #854d0e;   --jayd-border: #fef08a;
+    --maqbul-bg: #fff7ed; --maqbul-text: #9a3412; --maqbul-border: #fed7aa;
+    --gold: #d4a017; --silver: #94a3b8; --bronze: #b45309;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Cairo', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 1.5rem 1rem; }
+  header { text-align: center; margin-bottom: 1.5rem; }
+  header h1 { font-size: 1.5rem; font-weight: 700; color: #1a3a6e; margin-bottom: 0.2rem; }
+  header p { font-size: 0.85rem; color: var(--muted); }
+  .grade-legend { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 1.25rem; }
+  .grade-legend span { font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; border: 1px solid; }
+  .controls { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 1rem; align-items: center; }
+  .controls input, .controls select { font-family: 'Cairo', sans-serif; font-size: 13px; padding: 7px 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--card); color: var(--text); outline: none; transition: border-color 0.2s; }
+  .controls input { flex: 1; min-width: 160px; }
+  .controls input:focus, .controls select:focus { border-color: #3b82f6; }
+  .count { font-size: 12px; color: var(--muted); margin-right: auto; }
+  .table-wrap { background: var(--card); border-radius: 12px; border: 1px solid var(--border); overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.06); overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  thead th { background: #1a3a6e; color: #fff; font-weight: 600; padding: 10px 8px; text-align: right; cursor: pointer; white-space: nowrap; user-select: none; border-left: 1px solid rgba(255,255,255,0.1); transition: background 0.15s; }
+  thead th:hover { background: #254fa0; }
+  thead th:first-child { border-left: none; }
+  tbody tr:nth-child(even) { background: #f8fafc; }
+  tbody tr:hover { background: #eff6ff; }
+  tbody td { padding: 7px 8px; border-bottom: 1px solid var(--border); vertical-align: middle; white-space: nowrap; }
+  tbody tr:last-child td { border-bottom: none; }
+  .rank-cell { text-align: center; font-weight: 700; font-size: 13px; min-width: 36px; }
+  .rank-1 { color: var(--gold); } .rank-2 { color: var(--silver); } .rank-3 { color: var(--bronze); } .rank-o { color: var(--muted); font-size: 12px; }
+  .name-cell { max-width: 180px; overflow: hidden; text-overflow: ellipsis; font-weight: 500; }
+  .sc { text-align: center; }
+  .badge { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 20px; border: 1px solid; }
+  .b-mm { background: var(--mumtaz-bg); color: var(--mumtaz-text); border-color: var(--mumtaz-border); }
+  .b-jj { background: var(--jaydj-bg);  color: var(--jaydj-text);  border-color: var(--jaydj-border); }
+  .b-j  { background: var(--jayd-bg);   color: var(--jayd-text);   border-color: var(--jayd-border); }
+  .b-mq { background: var(--maqbul-bg); color: var(--maqbul-text); border-color: var(--maqbul-border); }
+  .bar-wrap { display: flex; align-items: center; gap: 5px; min-width: 100px; }
+  .bar-bg { flex: 1; height: 5px; background: #e2e8f0; border-radius: 3px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 3px; }
+  .note { font-size: 10px; color: var(--muted); }
+  @media (max-width: 640px) { .yr-cell { display: none; } .name-cell { max-width: 120px; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>ترتيب طلاب الهندسة المدنية — الرابعة</h1>
+  <p>جامعة الزقازيق — العام الأكاديمي 2025-2026 — المجموع من 6000</p>
+</header>
+<div class="grade-legend">
+  <span class="badge b-mm">ممتاز ≥ 89.5%</span>
+  <span class="badge b-jj">جيد جدا ≥ 79.5%</span>
+  <span class="badge b-j">جيد ≥ 69.5%</span>
+  <span class="badge b-mq">مقبول ≥ 59.5%</span>
+</div>
+<div class="controls">
+  <input type="text" id="srch" placeholder="ابحث باسم الطالب..." oninput="render()">
+  <select id="grF" onchange="render()">
+    <option value="">كل التقديرات</option>
+    <option value="ممتاز">ممتاز</option>
+    <option value="جيد جدا">جيد جدا</option>
+    <option value="جيد">جيد</option>
+    <option value="مقبول">مقبول</option>
+  </select>
+  <span class="count" id="cnt"></span>
+</div>
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th onclick="sortBy('rank')" style="width:40px">ترتيب</th>
+        <th onclick="sortBy('name')" style="width:185px">اسم الطالب</th>
+        <th onclick="sortBy('y1')" class="yr-cell" style="width:65px">إعدادية</th>
+        <th onclick="sortBy('y2')" class="yr-cell" style="width:58px">أولى</th>
+        <th onclick="sortBy('y3')" class="yr-cell" style="width:58px">ثانية</th>
+        <th onclick="sortBy('y4')" class="yr-cell" style="width:58px">ثالثة</th>
+        <th onclick="sortBy('pct')" style="width:130px">المجموع / 6000</th>
+        <th style="width:72px">التقدير</th>
+      </tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+  </table>
+</div>
+<script>
+// سنه null = غير موجودة
+const raw = [
+  {name:"ادهم أحمد محمد رشاد يحى",y1:847,y2:911,y3:852,y4:849},
+  {name:"إسراء محمد على ياقوت",y1:1062,y2:1168,y3:1249,y4:1211},
+  {name:"اسيل ماجد السيد منصورمحمد",y1:921,y2:1085,y3:934,y4:849},
+  {name:"أفنان حامد أحمد مصطفى يوسف",y1:875,y2:989.5,y3:914,y4:855},
+  {name:"ابتهال علاء صباح عطيه",y1:null,y2:850,y3:986,y4:1065},
+  {name:"إبرار توفيق عبدالغنى محمد السيد",y1:792,y2:822.5,y3:850,y4:null},
+  {name:"ابراهيم أحمد عبد الصادق محمود",y1:995,y2:1034,y3:1085,y4:1005},
+  {name:"ابراهيم جمال عبد الباري مأمون",y1:1016,y2:1129,y3:1230,y4:1279},
+  {name:"ابراهيم محمد عطيه حسن برعى",y1:1020,y2:1164,y3:1053,y4:null},
+  {name:"ابراهيم ناجى ابراهيم دسوقى",y1:224.5,y2:938,y3:847,y4:877},
+  {name:"ابراهيم ياسر ابراهيم عبداللطيف",y1:872,y2:978,y3:906,y4:880},
+  {name:"أحمد ابراهيم حسن ابراهيم",y1:858,y2:955,y3:839,y4:870},
+  {name:"أحمد اشرف ابوعافيه عبد السلام حسن",y1:816,y2:840.5,y3:840,y4:null},
+  {name:"أحمد اشرف عبد الستار محمد",y1:834,y2:864,y3:890,y4:null},
+  {name:"أحمد المسعيد ناصف محمود",y1:928,y2:954,y3:1064,y4:1030},
+  {name:"أحمد السيد شحاته عبد الفتاح رزق",y1:1027,y2:1162,y3:1144,y4:1168},
+  {name:"أحمد السيد فتحى عطيه سيد احمد",y1:918,y2:1068,y3:1088,y4:1075},
+  {name:"أحمد جمال عبد الناصر عبد الغفور",y1:1057,y2:1125,y3:1089,y4:1192},
+  {name:"أحمد حسن عبدالمحسن على",y1:951,y2:1007,y3:929,y4:841},
+  {name:"أحمد سامى اسماعيل على",y1:1122,y2:1231,y3:1328,y4:1334},
+  {name:"أحمد سمير عبدالحميد رفاعى العوضى",y1:1173,y2:1193,y3:1252,y4:1243},
+  {name:"أحمد صلاح موسى عبدالرحمن",y1:968,y2:1024,y3:1095,y4:1178},
+  {name:"أحمد عادل السيد عبد المجيد عبد",y1:1112,y2:1196,y3:1270,y4:1226},
+  {name:"أحمد عاطف محمد على امين",y1:1084,y2:1252,y3:1232,y4:1331},
+  {name:"أحمد عبد الفتاح السعيد محمد",y1:1088,y2:1287,y3:1293,y4:1333},
+  {name:"أحمد عبدالوهاب عبدالمحسن",y1:1011,y2:1091,y3:1184,y4:1245},
+  {name:"أحمد عصام درويش محمد",y1:846,y2:920,y3:888,y4:null},
+  {name:"أحمد علاء محمد عبدالحميد",y1:261,y2:982.5,y3:875,y4:null},
+  {name:"أحمد عماد احمد ابراهيم السيد",y1:961,y2:474,y3:899,y4:null},
+  {name:"أحمد ماجد السيد على سالمان",y1:334,y2:939,y3:852,y4:1027},
+  {name:"أحمد مجدى عبدالحميد انور",y1:882,y2:1038,y3:907,y4:814},
+  {name:"أحمد محرز السيد محمد",y1:823,y2:412,y3:879,y4:492},
+  {name:"أحمد محمد عيسى زهران",y1:949,y2:832,y3:1259,y4:1303},
+  {name:"أحمد محمد السيد سليم",y1:1048,y2:1209,y3:1194,y4:1249},
+  {name:"أحمد محمد سعد عطية",y1:877.5,y2:805,y3:852.5,y4:794.5},
+  {name:"أحمد محمد صلاح محمد",y1:861,y2:885,y3:954,y4:null},
+  {name:"أحمد محمد عبد اللـه محمد الاكرت",y1:901,y2:893,y3:870,y4:null},
+  {name:"أحمد محمد عبدالغنى منصور سايمان",y1:935.5,y2:426,y3:1063,y4:939.5},
+  {name:"أحمد محمد عدلى شاذلى",y1:1138,y2:1181,y3:1163,y4:1141},
+  {name:"أحمد محمد محمد عبدالهادى مسعود",y1:926,y2:1226,y3:1156,y4:977},
+  {name:"أحمد محمد محمود عوض محمد",y1:914,y2:997,y3:914,y4:1007},
+  {name:"أحمد محمود السيد محالعال محمد",y1:861,y2:912,y3:870,y4:null},
+  {name:"أحمد محمود عبدالعظيم على محمد",y1:981,y2:846.5,y3:881,y4:null},
+  {name:"أحمد ماجد السيد محمد على سالمان",y1:883.5,y2:914.5,y3:907,y4:null},
+  {name:"أحمد محمد وليد علاء الدين",y1:264,y2:909,y3:930,y4:880},
+  {name:"أروى أسامة فتحى امين",y1:1069,y2:1067,y3:1220,y4:1313},
+  {name:"اريا بدوى فوزى بدوى الشافعى",y1:1071,y2:1172,y3:1235,y4:1297},
+  {name:"اسراء اسماعيل عبد الرحمن فوده",y1:1019,y2:1127,y3:1278,y4:1311},
+  {name:"اسلام أحمد محمد عبدالرحيم",y1:1058,y2:1121,y3:1021,y4:1041},
+  {name:"اسلام عبدالحميد المحسن عبدالحميد",y1:1006,y2:1180,y3:1182,y4:1122},
+  {name:"أسماء أحمد عبد القادر ابراهيم مصطفى",y1:1043,y2:1110,y3:1043,y4:1152},
+  {name:"أسماء على الهادى على المحمدى",y1:1017,y2:1169,y3:1105,y4:1179},
+  {name:"أسماء فوزى محمد محمد ابراهيم",y1:1045,y2:1199,y3:1154,y4:1194},
+  {name:"أسماء محمد الشيراوى ابراهيم",y1:1069,y2:1223,y3:1196,y4:1291},
+  {name:"اسيل ابراهيم ابراهيم على قدوقه",y1:1131,y2:1334,y3:1331,y4:1345},
+  {name:"اشرقت محمد حبيب محمد على",y1:1013,y2:1103,y3:1196,y4:1126},
+  {name:"الاء عاطف السيد عبدالحليم القاضى",y1:850.5,y2:969.5,y3:918,y4:864.5},
+  {name:"الاء عبد الرحمن الحنفى الحنفى نوار",y1:1033,y2:1129,y3:1048,y4:947},
+  {name:"الاء محمد امام السيد",y1:886,y2:970,y3:937,y4:839.5},
+  {name:"السعيد محمد محمد يوسف يوسف",y1:786.5,y2:884.5,y3:914,y4:839.5},
+  {name:"امانى عبدالعزيز احمد ابراهيم ريان",y1:824,y2:993.5,y3:847,y4:868.5},
+  {name:"امانى كامل ابراهيم محمد منصور",y1:981,y2:1032,y3:1049,y4:1003},
+  {name:"امنيه عاطف سيد عبدالمالك",y1:859,y2:977,y3:829,y4:235.5},
+  {name:"انس محمد رمضان سالم فايد",y1:811.5,y2:944,y3:936,y4:842},
+  {name:"ايمن السيد بكرى السيد",y1:863,y2:949.5,y3:834,y4:828},
+  {name:"ايه صبرى محمد الصغير",y1:822,y2:1010,y3:1196,y4:null},
+  {name:"ايه عبدالحميد سعيد مسلم محمد سويلم",y1:915,y2:896.5,y3:894,y4:890.5},
+  {name:"ايه عبداللـه على عبداللـه",y1:885,y2:934.5,y3:842,y4:890},
+  {name:"ايه يس ابراهيم يس",y1:259.5,y2:925.5,y3:800,y4:null},
+  {name:"باسم إيهاب عزيز حنا",y1:259,y2:919,y3:938,y4:927},
+  {name:"جمال عبد الناصر محمد مرسى",y1:825,y2:938.5,y3:882,y4:881.5},
+  {name:"حسن عبدالمحسن على محمد شاهين",y1:815,y2:865,y3:887,y4:872},
+  {name:"حسين حازم حسين امين الشايب",y1:927,y2:438,y3:918,y4:null},
+  {name:"حنان السيد محمد عبد العظيم عيد",y1:993,y2:1213,y3:1319,y4:1372},
+  {name:"خالد محمد امين محمد طاهر",y1:877,y2:855,y3:963,y4:849},
+  {name:"خالد محمد عبد الرحمن احمد الدوه",y1:1018,y2:989,y3:1052,y4:967},
+  {name:"خالد محمد محمود ابراهيم",y1:1065,y2:1041,y3:1035,y4:1114},
+  {name:"خلود ابراهيم السيد ابراهيم",y1:1025,y2:1263,y3:1313,y4:1335},
+  {name:"خلود طارق السيد حافظ الليثى",y1:1107,y2:1186,y3:1187,y4:1196},
+  {name:"دنيا أحمد سعد محمد مرسى هنون",y1:1081,y2:1171,y3:1104,y4:1066},
+  {name:"ديفيد مجدى يعقوب رزق تكلا",y1:870,y2:917,y3:860,y4:null},
+  {name:"دينا وحيد محمد محمود",y1:250,y2:886.5,y3:825,y4:838},
+  {name:"رامى محمد أحمد رفعت جميل",y1:884,y2:392,y3:836,y4:883.5},
+  {name:"رضا محمد السيد محمد عبدالهادى",y1:1084,y2:1149,y3:1156,y4:1175},
+  {name:"رنا عبدالعزيز على عبدالعزيز عزام",y1:1182,y2:1277,y3:1265,y4:1282},
+  {name:"روان هانى محمد كامل وجدى",y1:886,y2:915,y3:895,y4:823.5},
+  {name:"زاهر هشام زاهر بركات",y1:246,y2:938,y3:895,y4:null},
+  {name:"زياد أحمد سمير عطيه حسن",y1:277,y2:1039,y3:808,y4:1141},
+  {name:"زياد تامر عاطف ابراهيم الدسوقى",y1:1013,y2:1045,y3:1101,y4:1083},
+  {name:"زياد خالد ابراهيم اسماعيل الملكى",y1:268,y2:825.5,y3:863,y4:null},
+  {name:"زياد محمد حسن السيد",y1:831,y2:909,y3:853,y4:null},
+  {name:"زياد محمد سالم محمد السيد صبيحه",y1:786,y2:378.5,y3:944,y4:null},
+  {name:"زياد محمد عبدالعال ابراهيم",y1:263.5,y2:887.5,y3:845,y4:857.5},
+  {name:"زياد محمد فوزى طه",y1:254,y2:1016,y3:887,y4:254},
+  {name:"زياد ياسر فوزى طه",y1:836,y2:872.25,y3:null,y4:null},
+  {name:"ساره عبد العظيم فكرى على غريب",y1:1210,y2:1273,y3:1362,y4:1419},
+  {name:"سعد محمد سعد المرسى ابراهيم",y1:890,y2:885.5,y3:840,y4:null},
+  {name:"سعيد إيهاب سعيد احمد البرهامى",y1:1022,y2:995,y3:1083,y4:1118},
+  {name:"سلمى غريب السيد مهدى",y1:991,y2:1134,y3:1081,y4:1167},
+  {name:"سليمان ابراهيم سليمان ابراهيم",y1:843,y2:947,y3:909,y4:848.5},
+  {name:"سيف الدين اسلام شعبان محمد",y1:819,y2:858,y3:835,y4:862.5},
+  {name:"سيف ايمن محمد جمال الدين حسن",y1:264,y2:1019,y3:951,y4:null},
+  {name:"شروق حسن السيد حسن اسماعيل",y1:855,y2:831,y3:851,y4:862.5},
+  {name:"شهاب نبيل أحمد فريد سيدأحمد",y1:855,y2:884,y3:877,y4:null},
+  {name:"شيماء أحمد محمد الشحات الجملاطى",y1:836,y2:25,y3:872,y4:null},
+  {name:"صالح أحمد صالح عطيه",y1:217,y2:897.5,y3:842,y4:876},
+  {name:"صلاح أحمد عبداللطيف عبدالفتاح",y1:976,y2:1094,y3:1107,y4:1072},
+  {name:"ضحى أحمد عيسى ابراهيم",y1:1092,y2:1060,y3:1150,y4:1128},
+  {name:"ضياء الدين ابراهيم محمد ضياء الدين",y1:1075,y2:1032,y3:1007,y4:null},
+  {name:"طارق محمد ضيف عبدالرحمن",y1:772,y2:929,y3:869.5,y4:null},
+  {name:"عادل محمد مصطفى محمد",y1:863,y2:929.5,y3:872,y4:872},
+  {name:"عاصم حسن عبد العال محمد",y1:863,y2:929.5,y3:857,y4:null},
+  {name:"عبد الرحمن ايمن جمعه مصلحى السيد",y1:1175,y2:1139,y3:1133,y4:1204},
+  {name:"عبد الرحمن طارق ابراهيم عيده زيدان",y1:1201,y2:1276,y3:1173,y4:1135},
+  {name:"عبد الرحمن عبد الجواد حلمى عبده",y1:1096,y2:1198,y3:null,y4:null},
+  {name:"عبد الرحمن محمد ابو خاطره ابراهيم",y1:820,y2:886,y3:null,y4:936},
+  {name:"عبد الرحمن محمد اسماعيل عثمان",y1:1002,y2:453,y3:861,y4:null},
+  {name:"عبد الرحمن محمد عيسى على السيد",y1:918.5,y2:945.5,y3:952,y4:null},
+  {name:"عبد المنعم اسماعيل عبد المنعم",y1:1062,y2:1046,y3:1107,y4:1137},
+  {name:"عبدالرحمن رضا عبدالنبى علوان ندا",y1:240.5,y2:885,y3:809,y4:813},
+  {name:"عبدالرحمن محمد لطفى ابراهيم صقر",y1:821,y2:815,y3:null,y4:null},
+  {name:"عبدالرحمن محمد متولى السيد على",y1:838,y2:886,y3:940.5,y4:921},
+  {name:"عبدالرحمن محمود سليمان عبدالنور",y1:246,y2:826.5,y3:804,y4:857},
+  {name:"عبدالعزيز محمود عبدالحكيم جوده اسماعيل",y1:807,y2:848,y3:857,y4:null},
+  {name:"عبداللـه احمد محمود احمد حسن",y1:836.5,y2:402,y3:843,y4:null},
+  {name:"عبداللـه عمرو فريد أحمد القبانى",y1:803.5,y2:1017,y3:1118,y4:1246},
+  {name:"عبداللـه محمد عبده على الفتاح",y1:1060,y2:1114,y3:1117,y4:null},
+  {name:"عبداللـه محمد فتحى عبدالحميد",y1:818,y2:840,y3:826,y4:null},
+  {name:"عبداللـه محمود احمد محمد عوض الله",y1:922,y2:923,y3:929,y4:945},
+  {name:"عبداللـه محمود موسى محمود دياب",y1:1130,y2:1347,y3:1405,y4:1441},
+  {name:"عصام محمد السيد عزازى محمد",y1:885,y2:912,y3:438,y4:null},
+  {name:"على محمد محمد محمد",y1:275,y2:1067,y3:889,y4:null},
+  {name:"عمار عاطف نصر الدين سلامه",y1:947,y2:987,y3:1033,y4:1029},
+  {name:"عمر السيد عبد العزيز السيد",y1:856.5,y2:906,y3:null,y4:918},
+  {name:"عمر خالد صلاح الدين عبدالمجيد",y1:894,y2:914,y3:872,y4:866},
+  {name:"عمر طارق عبد الفتاح ذكى عامر",y1:1245,y2:1421,y3:1395,y4:1396},
+  {name:"عمر محمد العزب احمد الكيلانى",y1:1218,y2:1333,y3:1297,y4:1375},
+  {name:"عمر محمد فتحى عبد الحميد سليم",y1:1086,y2:1164,y3:1051,y4:1043},
+  {name:"عمرو محمد على احمد",y1:860,y2:883,y3:851,y4:null},
+  {name:"عمرو ياسر عبد السلام السيد حسن",y1:1017,y2:1213,y3:1149,y4:1200},
+  {name:"فاطمه عبدالحليم عبدالحفيظ عبدالحليم",y1:823,y2:917.5,y3:839,y4:881.5},
+  {name:"فرج سمير فرج باز",y1:946,y2:1083,y3:973,y4:926},
+  {name:"كريم أحمد محمد عثمان",y1:235.5,y2:838,y3:819,y4:916},
+  {name:"كريم عبد الشافى ابراهيم احمد",y1:1060,y2:1114,y3:1117,y4:1155},
+  {name:"كريم عبد العظيم عماد صابر عبد",y1:1174,y2:1331,y3:1313,y4:1364},
+  {name:"كريم علاء محمد فاروق محمد يوسف",y1:887,y2:1098,y3:880,y4:null},
+  {name:"كريم مصطفى ابراهيم احمد",y1:800.5,y2:828,y3:937,y4:1062},
+  {name:"مؤمن عبدالمنعم محمد محمد طه",y1:1074,y2:1313,y3:1288,y4:1178},
+  {name:"مازن ياسر محمد محمد",y1:1000,y2:1197,y3:1188,y4:1245},
+  {name:"مامون محمد محمد امين منصور",y1:873,y2:854,y3:824,y4:null},
+  {name:"محمد أحمد محمد أحمد الجوهرى",y1:790,y2:852.5,y3:854,y4:null},
+  {name:"محمد أسامه السيد تهامى على يسن",y1:941,y2:863,y3:null,y4:899.5},
+  {name:"محمد أسامه جوده ابراهيم",y1:800.5,y2:879,y3:912,y4:943},
+  {name:"محمد أسامه محمد محمد محمود",y1:912,y2:1207,y3:1193,y4:1159},
+  {name:"محمد الحسن احمد حسين حجازى",y1:819,y2:889,y3:null,y4:889},
+  {name:"محمد السيد جاد الكريم محمد على",y1:1055,y2:1029,y3:1077,y4:1050},
+  {name:"محمد السيد عبده محمود",y1:1033,y2:1010,y3:1016,y4:1033},
+  {name:"محمد السيد على عيدريه",y1:1000,y2:1052,y3:1111,y4:1151},
+  {name:"محمد السيد محمد شبانه",y1:881,y2:436,y3:895,y4:null},
+  {name:"محمد العربى السيد سعدالدين",y1:982,y2:524,y3:1119,y4:1173},
+  {name:"محمد ايمن عزت عثمان قنديل",y1:1055,y2:1108,y3:1054,y4:1157},
+  {name:"محمد ايمن محمد عبداللـه محمد",y1:1023,y2:1202,y3:1200,y4:1262},
+  {name:"محمد ثروت على السيد عطوه",y1:1092,y2:1060,y3:1150,y4:1246},
+  {name:"محمد جمال احمد حمد مأنصور",y1:839,y2:875,y3:842,y4:848.5},
+  {name:"محمد جمال محمد طه محمد",y1:1068,y2:1132,y3:1164,y4:1115},
+  {name:"محمد خالد حامد عبد العظيم حامد",y1:1178,y2:1345,y3:1352,y4:1413},
+  {name:"محمد خالد محمد عبدالعظيم",y1:872,y2:472,y3:949,y4:829.5},
+  {name:"محمد رمزى هيثم رمزى حسن متولى",y1:841.5,y2:405,y3:827,y4:842},
+  {name:"محمد سليمان سليمان سليمان",y1:816,y2:869.5,y3:927,y4:916},
+  {name:"محمد عادل محمد طه الفلش",y1:1427,y2:1447,y3:1434,y4:1431},
+  {name:"محمد عبدالرحمن عبدالسميع عبدالودود",y1:821,y2:779,y3:806,y4:null},
+  {name:"محمد عبداللـه محمد عبد السميع",y1:979,y2:null,y3:null,y4:null},
+  {name:"محمد عبدالنبى السيد على",y1:973,y2:867.5,y3:889,y4:891},
+  {name:"محمود ابراهيم محمود فرناس ابراهيم",y1:1038,y2:1059,y3:1095,y4:1046},
+  {name:"محمود احمد على سليمان عبد العزيز",y1:1085,y2:1076,y3:1095,y4:1085},
+  {name:"محمود احمد محمود عبد الجواد",y1:1108,y2:1118,y3:1128,y4:1163},
+  {name:"محمود اسامه محمد شعبان",y1:804,y2:932,y3:888,y4:null},
+  {name:"محمود بدر باسم عرفات محمد",y1:894,y2:850.5,y3:null,y4:null},
+  {name:"محمود خالد محمد عبدالرحمن",y1:912,y2:968,y3:1078,y4:1029},
+  {name:"محمود سامى عبدالمولى حافظ",y1:237,y2:1092,y3:918,y4:914.5},
+  {name:"محمود سامى محمد عطيه سيد احمد",y1:896,y2:1087,y3:null,y4:891},
+  {name:"محمود سعيد عبدالحليم حسن",y1:891,y2:1134,y3:919,y4:959},
+  {name:"محمود سعيد محمد محمد السيد",y1:873,y2:811,y3:856,y4:853},
+  {name:"محمود صلاح الصاوى ابراهيم",y1:988,y2:985,y3:941,y4:835.5},
+  {name:"محمود طارق محمد عبدالوهاب رزق",y1:837,y2:383.5,y3:980,y4:null},
+  {name:"محمود عبدالحميد محمد احمد محمد",y1:269,y2:863,y3:null,y4:883.5},
+  {name:"محمود عبدالعزيز على احمد محمد",y1:828,y2:796,y3:null,y4:null},
+  {name:"محمود عمر عبد الله داؤد متولى",y1:1144,y2:1273,y3:1262,y4:1209},
+  {name:"محمود محمد ابراهيم سيد احمد مايجى",y1:859,y2:412,y3:922,y4:795},
+  {name:"محمود محمد احمد سعيد احمد",y1:1033,y2:1227,y3:1331,y4:1294},
+  {name:"محمود محمد احمد محمد حفناوى",y1:247,y2:990,y3:823,y4:null},
+  {name:"محمود محمد احمد مختار حسن",y1:816,y2:875,y3:910.5,y4:null},
+  {name:"محمود محمد السيد عبدالسلام",y1:877,y2:930,y3:1080,y4:875},
+  {name:"محمود محمد جيوشى محمد",y1:235.5,y2:796,y3:829.5,y4:null},
+  {name:"محمود محمد رفعت السيد صابر",y1:870,y2:921,y3:872,y4:818.5},
+  {name:"محمود محمد عبدالعزيز محمد ابوعرب",y1:1158,y2:1219,y3:1181,y4:1068},
+  {name:"محمود محمد لطفى هجرس",y1:1044,y2:1102,y3:1162,y4:1188},
+  {name:"محمود محمد محمود عبدالشافى",y1:877.5,y2:933,y3:876,y4:null},
+  {name:"محمود محمد نبيل محمد سليمان",y1:1137,y2:1198,y3:1194,y4:1222},
+  {name:"مريم محمد محمد فهمى حامد",y1:1043,y2:1206,y3:1234,y4:1122},
+  {name:"مريهان السيد محمد الشيخ هاشم",y1:876,y2:893.5,y3:840,y4:821},
+  {name:"مصطفى ابراهيم رمضان امين السيد",y1:817,y2:930.5,y3:853,y4:891.5},
+  {name:"مصطفى أحمد امين الصديق حسن النشار",y1:1422,y2:1436,y3:1463,y4:1436},
+  {name:"مصطفى اشرف طنطاوى يوسف",y1:811,y2:1004,y3:null,y4:954},
+  {name:"مصطفى اشرف مصطفى كامل محمد",y1:235.5,y2:819,y3:835,y4:null},
+  {name:"مصطفى امين بركات محمد عطيه",y1:810,y2:915.5,y3:873,y4:null},
+  {name:"مصطفى جمال يوسف محمد عليوة",y1:1055,y2:1149,y3:1088,y4:1090},
+  {name:"معتز أحمد عبدالقادر رياض",y1:999,y2:1005,y3:1025,y4:953},
+  {name:"معتصم محمد سعد سعيد احمد",y1:800.5,y2:894.5,y3:859,y4:null},
+  {name:"مهند نصر الدين عوض محمود",y1:1030,y2:1080,y3:1139,y4:1177},
+  {name:"مى حسين السيد شلبى",y1:844.5,y2:819,y3:386,y4:844.5},
+  {name:"ميرنا احمد محمد فكرى عبداللـه",y1:971,y2:1033,y3:1000,y4:null},
+  {name:"مينا جرايند جميل جرجس",y1:1047,y2:1062,y3:1163,y4:1155},
+  {name:"مينا صبرى اسكندر عوض زغلول",y1:817,y2:930.5,y3:839,y4:881.5},
+  {name:"نجلاء محمد محمد محمد ابراهيم",y1:498,y2:849,y3:857,y4:898.5},
+  {name:"ندا ايمن زهران على زهران",y1:1047,y2:1062,y3:1163,y4:1084},
+  {name:"ندى اشرف عبدالسلام احمد",y1:983,y2:1192,y3:1208,y4:1277},
+  {name:"نرمين جلال فتحى شحاته",y1:987,y2:1120,y3:1268,y4:1266},
+  {name:"نرمين عصام شاهين عبدالحميد انور",y1:905,y2:891,y3:895,y4:null},
+  {name:"هبة نبيل فاروق محمود",y1:233,y2:869,y3:842,y4:null},
+  {name:"يارا نبيل احمد محمد",y1:1002,y2:1113,y3:1121,y4:1084},
+  {name:"يحى محمد جودة عزب",y1:813,y2:867,y3:855,y4:null},
+  {name:"يوسف اشرف عبدالرحمن فهمى سليم",y1:856,y2:851.5,y3:null,y4:null},
+  {name:"يوسف صلاح حسنى محمد",y1:833,y2:880,y3:null,y4:null},
+  {name:"يوسف عبد الرحمن فتحى السيد قنديل",y1:976,y2:1056,y3:1036,y4:1084}
+];
+
+const MAX_PER_YEAR = 1500;
+
+function calcScore(s) {
+  const yrs = [s.y1, s.y2, s.y3, s.y4];
+  const valid = yrs.filter(v => v !== null && v !== undefined);
+  if (valid.length === 0) return { total: 0, outOf: 0, pct: 0 };
+  const sum = valid.reduce((a, b) => a + b, 0);
+  const outOf = valid.length * MAX_PER_YEAR;
+  const pct = sum / outOf * 100;
+  // scale to 6000
+  const scaled = sum / outOf * 6000;
+  return { total: parseFloat(scaled.toFixed(2)), outOf: 6000, pct: parseFloat(pct.toFixed(2)), years: valid.length };
+}
+
+function getGrade(pct) {
+  if (pct >= 89.5) return 'ممتاز';
+  if (pct >= 79.5) return 'جيد جدا';
+  if (pct >= 69.5) return 'جيد';
+  if (pct >= 59.5) return 'مقبول';
+  return 'ضعيف';
+}
+function badgeCls(g) { return g==='ممتاز'?'b-mm':g==='جيد جدا'?'b-jj':g==='جيد'?'b-j':'b-mq'; }
+function barColor(g) { return g==='ممتاز'?'#22c55e':g==='جيد جدا'?'#3b82f6':g==='جيد'?'#eab308':'#f97316'; }
+function fmt(v) { return v === null || v === undefined ? '—' : v; }
+
+let allData = raw.map(s => {
+  const sc = calcScore(s);
+  return { ...s, ...sc, grade: getGrade(sc.pct) };
+});
+allData.sort((a, b) => b.total - a.total);
+allData = allData.map((d, i) => ({ ...d, rank: i + 1 }));
+
+let sortCol = 'rank', sortAsc = true;
+
+function sortBy(col) {
+  if (sortCol === col) sortAsc = !sortAsc; else { sortCol = col; sortAsc = true; }
+  document.querySelectorAll('thead th').forEach(th => th.style.background = '');
+  render();
+}
+
+function render() {
+  const srch = document.getElementById('srch').value.trim();
+  const gr = document.getElementById('grF').value;
+  let view = [...allData];
+  if (srch) view = view.filter(d => d.name.includes(srch));
+  if (gr)   view = view.filter(d => d.grade === gr);
+
+  const cmp = {
+    rank:  (a,b) => a.rank - b.rank,
+    name:  (a,b) => a.name.localeCompare(b.name, 'ar'),
+    y1:    (a,b) => (a.y1||0) - (b.y1||0),
+    y2:    (a,b) => (a.y2||0) - (b.y2||0),
+    y3:    (a,b) => (a.y3||0) - (b.y3||0),
+    y4:    (a,b) => (a.y4||0) - (b.y4||0),
+    pct:   (a,b) => a.pct - b.pct,
+  };
+  if (cmp[sortCol]) view.sort((a, b) => sortAsc ? cmp[sortCol](a,b) : -cmp[sortCol](a,b));
+
+  document.getElementById('cnt').textContent = `إجمالي: ${view.length} طالب`;
+  document.getElementById('tbody').innerHTML = view.map(d => {
+    const rc = d.rank===1?'rank-1':d.rank===2?'rank-2':d.rank===3?'rank-3':'rank-o';
+    const ri = d.rank===1?'🥇':d.rank===2?'🥈':d.rank===3?'🥉':d.rank;
+    const barPct = Math.min(100, d.pct).toFixed(1);
+    const bc = barColor(d.grade);
+    const missingNote = d.years < 4 ? `<span class="note">(${d.years} سنوات)</span>` : '';
+    return `<tr>
+      <td class="rank-cell ${rc}">${ri}</td>
+      <td class="name-cell" title="${d.name}">${d.name}</td>
+      <td class="sc yr-cell">${fmt(d.y1)}</td>
+      <td class="sc yr-cell">${fmt(d.y2)}</td>
+      <td class="sc yr-cell">${fmt(d.y3)}</td>
+      <td class="sc yr-cell">${fmt(d.y4)}</td>
+      <td>
+        <div class="bar-wrap">
+          <span style="min-width:48px;font-weight:600;font-size:12px">${d.total.toFixed(1)}</span>
+          <div class="bar-bg"><div class="bar-fill" style="width:${barPct}%;background:${bc}"></div></div>
+          <span style="min-width:42px;font-size:11px;color:var(--muted)">${d.pct.toFixed(1)}%</span>
+          ${missingNote}
+        </div>
+      </td>
+      <td><span class="badge ${badgeCls(d.grade)}">${d.grade}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+render();
+</script>
+</body>
+</html>
